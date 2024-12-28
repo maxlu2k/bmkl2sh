@@ -25,6 +25,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -49,9 +50,6 @@ public class AuthenticationService {
 
     @Autowired
     BlackListTokenRepository blackListTokenRepository;
-
-
-
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -160,6 +158,12 @@ public class AuthenticationService {
         if (!authenticated) {
             throw new RuntimeException("UnAuthenticated");
         }
+        if (!user.getIsActive()) {
+            return AuthenticationResponse.builder()
+                    .authenticated(false)
+                    .message("Account is inactive. Please contact support.")
+                    .build();
+        }
 
         var accessToken = generateAccessToken(user); // Tạo Access Token
         var refreshToken = generateRefreshToken(user); // Tạo Refresh Token
@@ -201,7 +205,8 @@ public class AuthenticationService {
             throw new RuntimeException("error from verify");
         }
 
-        if(!blackListTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+        //kiểm tra id token có tồn tại trong blacklist hay ko nếu ko có thì sẽ đi tiếp còn nếu có sẽ chặn lại với exceptiom
+        if(blackListTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
             throw new RuntimeException("NOT FOUND ID!");
         }
         return signedJWT;

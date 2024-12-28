@@ -30,7 +30,6 @@ import java.text.ParseException;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@CrossOrigin("*")
 public class AuthenticationController {
     @Autowired
     AuthenticationService authenticationService;
