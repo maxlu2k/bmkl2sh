@@ -32,6 +32,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
@@ -50,6 +52,9 @@ public class AuthenticationService {
 
     @Autowired
     BlackListTokenRepository blackListTokenRepository;
+
+    @Autowired
+    DynamicBlacklistScheduler dynamicBlacklistScheduler;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -182,13 +187,16 @@ public class AuthenticationService {
         var signToken = verifyToken(request.getToken());
         String jit = signToken.getJWTClaimsSet().getJWTID();
         Date expryTime = signToken.getJWTClaimsSet().getExpirationTime();
-
+        LocalDateTime expiryDateTime = expryTime.toInstant()
+                .atZone(ZoneId.of("Asia/Ho_Chi_Minh"))
+                .toLocalDateTime();
         BackListToken blackListToken = BackListToken.builder()
                 .id(jit)
-                .expiration(expryTime)
+                .expiration(Date.from(expiryDateTime.atZone(ZoneId.systemDefault()).toInstant()))
                 .build();
 
         blackListTokenRepository.save(blackListToken);
+        dynamicBlacklistScheduler.scheduleTokenDeletion(jit,expiryDateTime);
     }
 
     //verifyToken

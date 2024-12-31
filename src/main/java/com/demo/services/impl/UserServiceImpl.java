@@ -86,6 +86,9 @@ public class UserServiceImpl implements UserService {
         if (userInput.getPassword() != null && !userInput.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(userInput.getPassword()));
         }
+        if (userInput.getIsActive() != null) {
+            user.setIsActive(userInput.getIsActive());
+        }
         // Cập nhật roles nếu được cung cấp và hợp lệ
         if (userInput.getRoles() != null && !userInput.getRoles().isEmpty()) {
             Set<Role> validRoles = new HashSet<>();

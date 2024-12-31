@@ -55,8 +55,6 @@ public class CustomJWTDecoderConfig implements JwtDecoder {
                     .build();
         }
 
-
-
         return nimbusJwtDecoder.decode(token);
     }
 }
