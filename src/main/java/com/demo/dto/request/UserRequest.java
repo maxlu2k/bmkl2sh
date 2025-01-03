@@ -20,9 +20,10 @@ public class UserRequest {
     String username;
     String firstName;
     String lastName;
-    String password;
     String email;
     String phoneNumber;
+    String password;
     Set<Role> roles;
     Boolean isActive;
+    Boolean isVerify;
 }

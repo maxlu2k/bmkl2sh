@@ -67,9 +67,7 @@ public class AuthenticationService {
             try {
                 verifyToken(token);
             }catch (Exception e){
-                return IntrospectResponse.builder()
-                        .valid(false)
-                        .build();
+                isValid = false;
             }
         return IntrospectResponse.builder()
                 .valid(isValid)
@@ -139,7 +137,7 @@ public class AuthenticationService {
 
         boolean isVerified = signedJWT.verify(verifier);
         Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-
+        verifyToken(refreshToken);
         if (!isVerified || expirationTime.before(new Date())) {
             throw new RuntimeException("Invalid or expired Refresh Token");
         }

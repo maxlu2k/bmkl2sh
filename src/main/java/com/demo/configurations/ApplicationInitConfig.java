@@ -48,9 +48,13 @@ public class ApplicationInitConfig {
             if (userRepository.findByUsername("admin").isEmpty()) {
                 //Tạo user mới có admin
                 User user = User.builder()
+                        .firstName("Mạnh")
+                        .lastName("Dũng")
+                        .phoneNumber("0369992515")
                         .username("admin")
                         .password(passwordEncoder.encode("admin"))
                         .isActive(true)
+                        .isVerify(true)
                         .email("manhdung6112000@gmail.com")
                         .roles(new HashSet<>(Collections.singletonList(adminRole))) //Collections.singletonList phương thức trả về danh sách chứa phần tử adminRole không trùng lặp
                         .build();

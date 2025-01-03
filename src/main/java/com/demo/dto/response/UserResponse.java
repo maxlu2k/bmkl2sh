@@ -24,11 +24,12 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserResponse {
     long id;
+    String firstName;
+    String lastName;
     String username;
+    String phoneNumber;
     String email;
-    Set<Role> roles;
     Boolean isActive;
-//    String firstName;
-//    String lastName;
-//    String phoneNumber;
+    Boolean isVerify;
+    Set<Role> roles;
 }

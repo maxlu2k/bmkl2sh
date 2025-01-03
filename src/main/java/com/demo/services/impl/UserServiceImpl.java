@@ -9,28 +9,30 @@ import com.demo.mappers.UserMapper;
 import com.demo.repositories.RoleRepository;
 import com.demo.repositories.UserRepository;
 import com.demo.services.UserService;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserMapper userMapper;
@@ -98,6 +100,51 @@ public class UserServiceImpl implements UserService {
             user.setRoles(validRoles);
         }
         User updatedUser = userRepository.save(user);
+        return userMapper.toUserResponse(updatedUser);
+    }
+
+    @Override
+    public UserResponse registerUser(UserRequest request) {
+        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+        Role userRole = roleRepository.findByName(PreDefinedRole.USER_ROLE);
+        if (userRole == null) {
+            throw new RuntimeException("Không tìm thấy vai trò mặc định USER.");
+        }
+        User user;
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+            if (!user.getIsVerify()) {
+                // Nếu tài khoản chưa được xác minh, cập nhật thông tin
+                user.setFirstName(request.getFirstName());
+                user.setLastName(request.getLastName());
+                user.setUsername(request.getUsername());
+                user.setPhoneNumber(request.getPhoneNumber());
+                user.setPassword(passwordEncoder.encode(request.getPassword()));
+                user.setIsActive(false); // Đặt lại trạng thái chờ xác minh
+            } else {
+                // Nếu tài khoản đã xác minh, throw exception hoặc xử lý phù hợp
+                throw new ResponseStatusException(HttpStatus.CONFLICT,"Email đã được sử dụng và xác minh!");
+            }
+        } else {
+            // Tạo tài khoản mới nếu email chưa tồn tại
+            user = User.builder()
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .username(request.getUsername())
+                    .email(request.getEmail())
+                    .phoneNumber(request.getPhoneNumber())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .isActive(true)  // Đặt là false, chờ xác minh email
+                    .isVerify(false) // Đánh dấu chưa xác minh email
+                    .roles(Collections.singleton(userRole))
+                    .build();
+        }
+
+        User updatedUser = userRepository.save(user);
+
+        // Gửi email xác minh
+//        emailService.sendVerificationEmail(updatedUser);
+
         return userMapper.toUserResponse(updatedUser);
     }
 

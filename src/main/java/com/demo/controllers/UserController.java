@@ -39,7 +39,6 @@ public class UserController {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         log.info("Username: {}",authentication.getName());
         authentication.getAuthorities().forEach(grantedAuthority -> log.info(grantedAuthority.getAuthority()));
-
         List<UserResponse> users = userService.getAll();
         return ResponseEntity.ok(users);
     }

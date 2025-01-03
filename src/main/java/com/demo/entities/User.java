@@ -43,7 +43,7 @@ public class User {
     String lastName;
     String email;
     String phoneNumber;
-
+    Boolean isVerify;
     @ManyToMany // Nhiều tài khoản có thể có nhiều vai trò
     Set<Role> roles;
 
