@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +43,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getAll() {
+
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
@@ -82,14 +86,32 @@ public class UserServiceImpl implements UserService {
         if (userInput.getUsername() != null && !userInput.getUsername().isBlank()) {
             user.setUsername(userInput.getUsername());
         }
+        if (userInput.getFirstName() != null && !userInput.getFirstName().isBlank()) {
+            user.setFirstName(userInput.getFirstName());
+        }
+        if (userInput.getLastName() != null && !userInput.getLastName().isBlank()) {
+            user.setLastName(userInput.getLastName());
+        }
         if (userInput.getEmail() != null && !userInput.getEmail().isBlank()) {
             user.setEmail(userInput.getEmail());
+        }
+        if (userInput.getPhoneNumber() != null && !userInput.getPhoneNumber().isBlank()) {
+            user.setPhoneNumber(userInput.getPhoneNumber());
+        }
+        if (userInput.getDateOfBirth() != null && !userInput.getDateOfBirth().toString().isBlank()) {
+            user.setDateOfBirth(userInput.getDateOfBirth());
+        }
+        if (userInput.getGender() != null) {
+            user.setGender(userInput.getGender());
         }
         if (userInput.getPassword() != null && !userInput.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(userInput.getPassword()));
         }
         if (userInput.getIsActive() != null) {
             user.setIsActive(userInput.getIsActive());
+        }
+        if (userInput.getIsVerify() != null) {
+            user.setIsVerify(userInput.getIsVerify());
         }
         // Cập nhật roles nếu được cung cấp và hợp lệ
         if (userInput.getRoles() != null && !userInput.getRoles().isEmpty()) {
@@ -146,6 +168,14 @@ public class UserServiceImpl implements UserService {
 //        emailService.sendVerificationEmail(updatedUser);
 
         return userMapper.toUserResponse(updatedUser);
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<UserResponse> pageUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(pageable)
+                .map(userMapper::toUserResponse);  // Convert từng user sang response
     }
 
 }

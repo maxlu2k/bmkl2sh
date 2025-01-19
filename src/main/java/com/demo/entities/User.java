@@ -1,5 +1,6 @@
 package com.demo.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,6 +19,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -43,6 +47,11 @@ public class User {
     String lastName;
     String email;
     String phoneNumber;
+    Boolean gender;
+
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    Date dateOfBirth;
     Boolean isVerify;
     @ManyToMany // Nhiều tài khoản có thể có nhiều vai trò
     Set<Role> roles;

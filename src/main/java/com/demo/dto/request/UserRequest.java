@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -23,6 +24,8 @@ public class UserRequest {
     String email;
     String phoneNumber;
     String password;
+    Boolean gender;
+    Date dateOfBirth;
     Set<Role> roles;
     Boolean isActive;
     Boolean isVerify;

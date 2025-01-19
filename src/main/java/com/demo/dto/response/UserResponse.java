@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -29,6 +30,8 @@ public class UserResponse {
     String username;
     String phoneNumber;
     String email;
+    Boolean gender;
+    Date dateOfBirth;
     Boolean isActive;
     Boolean isVerify;
     Set<Role> roles;
