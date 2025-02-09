@@ -2,6 +2,8 @@ package com.demo.services.impl;
 
 import com.demo.constant.PreDefinedRole;
 import com.demo.dto.request.UserRequest;
+import com.demo.dto.response.AuthenticationResponse;
+import com.demo.dto.response.AuthorizationResponse;
 import com.demo.dto.response.UserResponse;
 import com.demo.entities.Role;
 import com.demo.entities.User;
@@ -178,4 +180,36 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toUserResponse);  // Convert từng user sang response
     }
 
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<AuthorizationResponse> pageAuthorization(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(pageable)
+                .map(userMapper::toAuthorization);
+    }
+
+    @Override
+    public void updateUserRole(Long userId, String roleName, Boolean value) {
+        // Lấy thông tin user từ database
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Lấy thông tin role từ database
+        Role role = roleRepository.findById(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        // Cập nhật vai trò
+        Set<Role> roles = user.getRoles();
+        if (value) {
+            // Thêm vai trò
+            roles.add(role);
+        } else {
+            // Xóa vai trò
+            roles.remove(role);
+        }
+
+        // Lưu lại vào database
+        user.setRoles(roles);
+        userRepository.save(user);
+    }
 }
