@@ -1,9 +1,11 @@
 package com.demo.controllers;
 
+import com.demo.dto.request.UserExcel;
 import com.demo.dto.request.UserRequest;
 import com.demo.dto.response.ApiResponse;
 import com.demo.dto.response.UserResponse;
 import com.demo.entities.User;
+import com.demo.services.UploadService;
 import com.demo.services.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +22,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -30,6 +36,8 @@ public class UserController {
     @Autowired
     UserServiceImpl userService;
 
+    @Autowired
+    private UploadService uploadService;
 
     @Operation(summary = "Get user",description = "API Get all user")
     @GetMapping("/all")
@@ -66,5 +74,21 @@ public class UserController {
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserRequest request) {
         UserResponse createUser = userService.updateUser(id,request);
         return new ResponseEntity(createUser, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/uploadPhoto")
+    public ResponseEntity<?> uploadProfilePhoto(@RequestParam("file") MultipartFile file) {
+        try {
+            String filePath = uploadService.uploadFile(file, "profiles");
+            return ResponseEntity.ok().body("{\"message\": \"Profile photo uploaded!\", \"filePath\": \"" + filePath + "\"}");
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("{\"error\": \"Failed to upload profile photo!\"}");
+        }
+    }
+
+    @PostMapping("/upload-excel")
+    public ResponseEntity<String> uploadFile2(@RequestParam("file") MultipartFile file) throws IOException {
+        userService.importExcel(file);
+        return ResponseEntity.ok("import success!");
     }
 }

@@ -32,7 +32,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final String[] PUBLIC_ENPOINT_POST = {
-            "/api/users/add","/auth/*", "/auth/token", "/auth/introspect", "/swagger-ui/**","/auth/logout"
+            "/api/users/add","/api/users/uploadExcelFile","/auth/*", "/auth/token", "/auth/introspect","/file/*", "/swagger-ui/**","/auth/logout"
     };
 
     private static final String[] WHITE_LIST_URL = {"/swagger-ui/**","/api-docs/**"};

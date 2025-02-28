@@ -13,7 +13,6 @@ import jakarta.persistence.TemporalType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,7 +31,6 @@ import java.util.Date;
 @Table(name = "product")
 @Entity
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     long id;
@@ -53,6 +52,7 @@ public class Product {
     @JoinColumn(name = "cat_id")
     private Category category;
 
+    @Builder.Default
     @Column(name = "is_active")
     private Boolean isActive = true;// mặc định true là đang hoạt động
 

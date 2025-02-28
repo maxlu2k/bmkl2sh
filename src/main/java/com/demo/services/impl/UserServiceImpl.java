@@ -1,6 +1,7 @@
 package com.demo.services.impl;
 
 import com.demo.constant.PreDefinedRole;
+import com.demo.dto.request.UserExcel;
 import com.demo.dto.request.UserRequest;
 import com.demo.dto.response.AuthenticationResponse;
 import com.demo.dto.response.AuthorizationResponse;
@@ -13,6 +14,11 @@ import com.demo.repositories.UserRepository;
 import com.demo.services.UserService;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -23,16 +29,22 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Log4j2
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -45,7 +57,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @PreAuthorize("hasRole('ADMIN')")
     public List<UserResponse> getAll() {
-
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
@@ -212,4 +223,54 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
         userRepository.save(user);
     }
+
+
+    public void importExcel(final MultipartFile file) throws IOException {
+        final Workbook workbook = new XSSFWorkbook(file.getInputStream());
+        final Sheet sheet = workbook.getSheetAt(0);
+
+        final List<UserRequest> userss = new ArrayList<>();
+
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) continue; // Bỏ qua tiêu đề
+
+            Role userRole = roleRepository.findById(PreDefinedRole.USER_ROLE)
+                    .orElseThrow(() -> new RuntimeException("Role not found: USER"));
+            Set<Role> roles= new HashSet<>();
+            roles.add(userRole);
+            // Chuyển đổi roles từ String thành Set<Role>
+//            String rolesString = row.getCell(7).getStringCellValue();
+//            System.out.println(rolesString);
+//            Set<Role> roles = Arrays.stream(rolesString.split(","))
+//                    .map(roleName -> roleName.trim().toUpperCase())
+//                    .map(roleName -> roleRepository.findById(roleName)
+//                            .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
+//                    .collect(Collectors.toSet());
+
+            final UserRequest user = UserRequest.builder()
+                    .username(row.getCell(0).getStringCellValue())
+                    .password(passwordEncoder.encode("123"))  // Mã hóa password mặc định là 123
+                    .firstName(row.getCell(1).getStringCellValue())
+                    .lastName(row.getCell(2).getStringCellValue())
+                    .email(row.getCell(3).getStringCellValue())
+                    .phoneNumber(row.getCell(4).getStringCellValue())
+                    .gender(row.getCell(5).getBooleanCellValue())
+                    .dateOfBirth(row.getCell(6).getDateCellValue())
+                    .roles(roles)
+                    .isActive(row.getCell(8).getBooleanCellValue())
+                    .isVerify(row.getCell(9).getBooleanCellValue())
+                    .build();
+            userss.add(user);
+        }
+
+        // Chuyển từ UserRequest -> User Entity
+        List<User> usersToSave = userss.stream()
+                .map(userMapper::toUser) // Dùng UserMapper để chuyển đổi
+                .collect(Collectors.toList());
+        // Lưu vào database
+        userRepository.saveAll(usersToSave);
+        workbook.close(); // Đóng workbook sau khi sử dụng
+    }
+
+
 }
