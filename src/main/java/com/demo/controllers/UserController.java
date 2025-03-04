@@ -5,6 +5,7 @@ import com.demo.dto.request.UserRequest;
 import com.demo.dto.response.ApiResponse;
 import com.demo.dto.response.UserResponse;
 import com.demo.entities.User;
+import com.demo.exceptions.GlobalExceptionHandler;
 import com.demo.services.UploadService;
 import com.demo.services.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -89,6 +90,18 @@ public class UserController {
     @PostMapping("/upload-excel")
     public ResponseEntity<String> uploadFile2(@RequestParam("file") MultipartFile file) throws IOException {
         userService.importExcel(file);
+        return ResponseEntity.ok("import success!");
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> getNUll() {
+        try {
+            Long x = null;
+            x += 2;
+        }catch (NullPointerException e){
+            System.out.println("error" + e.getMessage());
+            throw e;
+        }
         return ResponseEntity.ok("import success!");
     }
 }
