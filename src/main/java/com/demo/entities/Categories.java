@@ -1,26 +1,28 @@
 package com.demo.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,32 +30,26 @@ import java.util.Date;
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "product")
 @Entity
-public class Product {
+@Table(name = "categories")
+public class Categories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private Long id;
 
-    String prodName;
+    @Column(nullable = false, unique = true)
+    private String catname;
 
-    BigDecimal prodPrice;
+    @Column(nullable = false, unique = true)
+    private String slug;
 
-    Integer prodQuantity;
-
-    String prodDescription;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    Date prodCreated;
-
-    String prodCreatedBy;
+    private String description;
+    private String imageUrl;
 
     @ManyToOne
-    @JoinColumn(name = "cat_id")
-    private Categories category;
+    @JoinColumn(name = "parent_id")
+    private Categories parent;
 
-    @Builder.Default
-    @Column(name = "is_active")
-    private Boolean isActive = true;// mặc định true là đang hoạt động
-
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Categories> subCategories = new ArrayList<>();
 }

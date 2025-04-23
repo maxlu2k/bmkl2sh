@@ -1,12 +1,10 @@
 package com.demo.controllers;
 
-import com.demo.dto.request.UserExcel;
 import com.demo.dto.request.UserRequest;
 import com.demo.dto.response.ApiResponse;
 import com.demo.dto.response.UserResponse;
 import com.demo.entities.User;
-import com.demo.exceptions.GlobalExceptionHandler;
-import com.demo.services.UploadService;
+import com.demo.services.impl.UploadService;
 import com.demo.services.impl.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.log4j.Log4j2;
@@ -25,9 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 @RestController

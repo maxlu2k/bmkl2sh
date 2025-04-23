@@ -1,4 +1,4 @@
-package com.demo.services;
+package com.demo.services.impl;
 
 import com.demo.repositories.BlackListTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;

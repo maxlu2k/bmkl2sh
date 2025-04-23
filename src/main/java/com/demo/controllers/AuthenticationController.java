@@ -11,7 +11,7 @@ import com.demo.dto.response.AccessTokenResponse;
 import com.demo.dto.response.ApiResponse;
 import com.demo.dto.response.AuthenticationResponse;
 import com.demo.dto.response.IntrospectResponse;
-import com.demo.services.AuthenticationService;
+import com.demo.services.impl.AuthenticationService;
 import com.demo.services.impl.UserServiceImpl;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;

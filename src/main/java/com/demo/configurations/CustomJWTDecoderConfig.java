@@ -3,9 +3,8 @@ package com.demo.configurations;
 
 import com.demo.dto.request.IntrospectRequest;
 import com.demo.repositories.BlackListTokenRepository;
-import com.demo.services.AuthenticationService;
+import com.demo.services.impl.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
