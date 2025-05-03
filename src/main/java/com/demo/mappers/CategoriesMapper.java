@@ -1,5 +1,6 @@
 package com.demo.mappers;
 
+import com.demo.dto.request.CategoriesNoIDRequest;
 import com.demo.dto.request.CategoriesRequest;
 import com.demo.dto.response.CategoriesResponse;
 import com.demo.entities.Categories;
@@ -15,6 +16,9 @@ public interface CategoriesMapper {
 
     @Mapping(source = "parentId", target = "parent", qualifiedByName = "mapParent")
     Categories toCategory(CategoriesRequest request);
+
+    @Mapping(source = "parentId", target = "parent", qualifiedByName = "mapParent")
+    Categories toCategoryNoID(CategoriesNoIDRequest request);
 
     @Named("mapParent")
     default Categories mapParent(Long parentId) {

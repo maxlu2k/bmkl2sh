@@ -40,6 +40,11 @@ public class CategoriesController {
         return ResponseEntity.ok(categoriesService.create(request));
     }
 
+    @PostMapping
+    public ResponseEntity<CategoriesResponse> createNoID(@RequestBody CategoriesRequest request) {
+        return ResponseEntity.ok(categoriesService.create(request));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<CategoriesResponse> update(@PathVariable Long id, @RequestBody CategoriesRequest request) {
         return ResponseEntity.ok(categoriesService.update(id, request));

@@ -1,5 +1,6 @@
 package com.demo.services.impl;
 
+import com.demo.dto.request.CategoriesNoIDRequest;
 import com.demo.dto.request.CategoriesRequest;
 import com.demo.dto.response.CategoriesResponse;
 import com.demo.entities.Categories;
@@ -49,6 +50,22 @@ public class CategoriesServiceImpl implements CategoriesService {
         Categories savedCategory = categoryRepository.save(category);
         return categoriesMapper.toCategoryResponse(savedCategory);
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public CategoriesResponse createNoID(CategoriesNoIDRequest request2) {
+        Categories category = categoriesMapper.toCategory(request2);
+
+        // Nếu có parentId, tìm danh mục cha
+        if (request.getParentId() != null) {
+            Categories parentCategory = categoryRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new RuntimeException("Parent category not found"));
+            category.setParent(parentCategory);
+        }
+
+        Categories savedCategory = categoryRepository.save(category);
+        return categoriesMapper.toCategoryResponse(savedCategory);
+    }
+
 
     @PreAuthorize("hasRole('ADMIN')")
     @Override
